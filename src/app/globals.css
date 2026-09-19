@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply min-h-dvh bg-slate-100 text-slate-900 antialiased;
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+@layer utilities {
+  .pt-safe-offset {
+    padding-top: max(1.5rem, var(--safe-top));
+  }
+
+  .pb-safe-offset {
+    padding-bottom: max(1rem, var(--safe-bottom));
+  }
+
+  .pb-quiz-footer {
+    padding-bottom: calc(5.75rem + var(--safe-bottom));
+  }
+
+  .px-safe-inline {
+    padding-left: max(1rem, var(--safe-left));
+    padding-right: max(1rem, var(--safe-right));
+  }
+}
+
+@layer components {
+  .btn-touch {
+    @apply min-h-12 touch-manipulation text-base font-semibold transition active:scale-[0.98];
+  }
+
+  .btn-primary {
+    @apply btn-touch w-full rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800;
+  }
+
+  .btn-secondary {
+    @apply btn-touch rounded-xl border border-slate-300 bg-white text-slate-700 active:bg-slate-100;
+  }
+
+  .quiz-footer-bar {
+    @apply fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200 bg-white/95 backdrop-blur;
+    padding-bottom: max(0.75rem, var(--safe-bottom));
+    padding-left: max(1rem, var(--safe-left));
+    padding-right: max(1rem, var(--safe-right));
+  }
+
+  .sticky-top-safe {
+    top: var(--safe-top);
+  }
+}
