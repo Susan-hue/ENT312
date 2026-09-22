@@ -49,7 +49,7 @@ export default function QuizPage() {
   }, []);
 
   function selectOption(letter: AnswerKey) {
-    if (!session || !currentQuestion) return;
+    if (!session || !currentQuestion || selectedAnswer != null) return;
     persist({
       ...session,
       answers: { ...session.answers, [currentQuestion.id]: letter },
@@ -85,6 +85,8 @@ export default function QuizPage() {
   }
 
   const isLast = currentIndex === total - 1;
+  const isAnswered = selectedAnswer != null;
+  const isCorrect = isAnswered && selectedAnswer === currentQuestion.correct_answer;
 
   return (
     <PageShell bottomPad="quiz" className="py-4 sm:py-6">
@@ -118,15 +120,35 @@ export default function QuizPage() {
               letter={letter}
               text={currentQuestion.options[letter]}
               selected={selectedAnswer === letter}
+              reveal={isAnswered}
+              correctAnswer={currentQuestion.correct_answer}
               onSelect={() => selectOption(letter)}
             />
           ))}
         </div>
-      </article>
 
-      <p className="mt-4 text-center text-xs text-slate-500">
-        Answers are hidden until you submit the full test.
-      </p>
+        {isAnswered && (
+          <div
+            className={`mt-5 rounded-xl border p-3 text-sm sm:p-4 ${
+              isCorrect
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-red-200 bg-red-50 text-red-900"
+            }`}
+          >
+            <p className="font-semibold">
+              {isCorrect ? "Correct!" : "Not quite."}
+            </p>
+            <p className="mt-1">
+              {isCorrect
+                ? "You chose the right answer."
+                : `Correct answer: ${currentQuestion.correct_answer} — ${currentQuestion.options[currentQuestion.correct_answer]}`}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-700">
+              {currentQuestion.explanation}
+            </p>
+          </div>
+        )}
+      </article>
 
       <footer className="quiz-footer-bar pt-3">
         <div className="mx-auto flex w-full max-w-lg gap-2 sm:gap-3">
