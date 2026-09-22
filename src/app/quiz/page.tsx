@@ -87,6 +87,7 @@ export default function QuizPage() {
   const isLast = currentIndex === total - 1;
   const isAnswered = selectedAnswer != null;
   const isCorrect = isAnswered && selectedAnswer === currentQuestion.correct_answer;
+  const selectedLabel = selectedAnswer ? currentQuestion.options[selectedAnswer] : "";
 
   return (
     <PageShell bottomPad="quiz" className="py-4 sm:py-6">
@@ -135,15 +136,28 @@ export default function QuizPage() {
                 : "border-red-200 bg-red-50 text-red-900"
             }`}
           >
-            <p className="font-semibold">
-              {isCorrect ? "Correct!" : "Not quite."}
-            </p>
-            <p className="mt-1">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-semibold sm:text-base">
+                {isCorrect ? "Correct!" : "Incorrect"}
+              </p>
+              <span
+                className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
+                  isCorrect
+                    ? "bg-emerald-600 text-white"
+                    : "bg-red-600 text-white"
+                }`}
+              >
+                {isCorrect ? "Right" : "Wrong"}
+              </span>
+            </div>
+
+            <p className="mt-2 leading-relaxed">
               {isCorrect
-                ? "You chose the right answer."
-                : `Correct answer: ${currentQuestion.correct_answer} — ${currentQuestion.options[currentQuestion.correct_answer]}`}
+                ? `Your answer: ${selectedLabel}`
+                : `Your answer: ${selectedLabel} · Correct answer: ${currentQuestion.correct_answer} — ${currentQuestion.options[currentQuestion.correct_answer]}`}
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-slate-700">
+
+            <p className="mt-3 leading-relaxed text-slate-700">
               {currentQuestion.explanation}
             </p>
           </div>
@@ -166,7 +180,7 @@ export default function QuizPage() {
             disabled={selectedAnswer == null}
             className="btn-primary flex-[1.65] px-2 text-sm disabled:scale-100 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:active:scale-100 sm:text-base"
           >
-            {isLast ? "Submit" : "Next"}
+            {isLast ? "Submit" : isAnswered ? "Next question" : "Next"}
           </button>
         </div>
       </footer>
