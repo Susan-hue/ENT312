@@ -42,6 +42,11 @@ export default function QuizPage() {
     currentQuestion != null
       ? (session?.answers[currentQuestion.id] ?? null)
       : null;
+  const [showExplanation, setShowExplanation] = useState(false);
+
+  useEffect(() => {
+    setShowExplanation(false);
+  }, [currentIndex]);
 
   const persist = useCallback((next: QuizSession) => {
     setSession(next);
@@ -88,11 +93,6 @@ export default function QuizPage() {
   const isAnswered = selectedAnswer != null;
   const isCorrect = isAnswered && selectedAnswer === currentQuestion.correct_answer;
   const selectedLabel = selectedAnswer ? currentQuestion.options[selectedAnswer] : "";
-  const [showExplanation, setShowExplanation] = useState(false);
-
-  useEffect(() => {
-    setShowExplanation(false);
-  }, [currentIndex]);
 
   return (
     <PageShell bottomPad="quiz" className="py-4 sm:py-6">
