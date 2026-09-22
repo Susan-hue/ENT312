@@ -6,13 +6,15 @@ import { useRouter } from "next/navigation";
 import { ChapterBreakdown } from "@/components/ChapterBreakdown";
 import { PageShell } from "@/components/PageShell";
 import { ReviewList } from "@/components/ReviewList";
-import { getQuestionsByIds } from "@/lib/questions";
+import { SectionBanner } from "@/components/SectionBanner";
+import { getQuestionsByIds, getSectionLabel } from "@/lib/questions";
 import {
   computeChapterBreakdown,
   computeScore,
   getIncorrectQuestionIds,
 } from "@/lib/quiz-utils";
 import { clearSession, createSession, loadSession, saveSession } from "@/lib/storage";
+import { getSelectedSectionId } from "@/lib/section-context";
 import type { QuizSession } from "@/types/quiz";
 
 export default function ResultsPage() {
@@ -20,7 +22,8 @@ export default function ResultsPage() {
   const [session, setSession] = useState<QuizSession | null>(null);
 
   useEffect(() => {
-    const stored = loadSession();
+    const sectionId = getSelectedSectionId();
+    const stored = sectionId ? loadSession(sectionId) : null;
     if (!stored || stored.phase !== "completed") {
       router.replace("/");
       return;
@@ -30,7 +33,7 @@ export default function ResultsPage() {
 
   const questions = useMemo(() => {
     if (!session) return [];
-    return getQuestionsByIds(session.questionIds);
+    return getQuestionsByIds(session.sectionId, session.questionIds);
   }, [session]);
 
   const score = useMemo(() => {
@@ -47,8 +50,9 @@ export default function ResultsPage() {
     if (!session) return;
     const wrongIds = getIncorrectQuestionIds(questions, session.answers);
     if (wrongIds.length === 0) return;
-    clearSession();
+    clearSession(session.sectionId);
     const next = createSession({
+      sectionId: session.sectionId,
       mode: "retry",
       questionIds: wrongIds,
     });
@@ -69,6 +73,7 @@ export default function ResultsPage() {
 
   return (
     <PageShell className="py-6 sm:py-8">
+      <SectionBanner label={getSectionLabel(session.sectionId)} />
       <header className="mb-6 text-center">
         <p className="text-sm font-medium text-slate-500">Test complete</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-900">
@@ -100,7 +105,7 @@ export default function ResultsPage() {
           )}
           <Link
             href="/"
-            onClick={() => clearSession()}
+            onClick={() => clearSession(session.sectionId)}
             className="btn-primary flex flex-1 items-center justify-center text-center text-sm sm:text-base"
           >
             New test
@@ -122,7 +127,7 @@ export default function ResultsPage() {
       <div className="mt-8 text-center">
         <Link
           href="/"
-          onClick={() => clearSession()}
+          onClick={() => clearSession(session.sectionId)}
           className="text-sm font-medium text-emerald-700 hover:underline"
         >
           Back to home

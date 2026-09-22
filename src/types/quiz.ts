@@ -16,6 +16,15 @@ export interface Question {
   options: QuestionOptions;
   correct_answer: AnswerKey;
   explanation: string;
+  source?: string;
+}
+
+export interface QuestionSection {
+  id: string;
+  label: string;
+  description: string;
+  total_questions: number;
+  questions: Question[];
 }
 
 export interface QuestionBank {
@@ -23,12 +32,13 @@ export interface QuestionBank {
   level: string;
   description: string;
   total_questions: number;
-  questions: Question[];
+  sections: QuestionSection[];
 }
 
 export type QuizMode = "full" | "chapter" | "retry";
 
 export interface QuizSession {
+  sectionId: string;
   phase: "in_progress" | "completed";
   mode: QuizMode;
   questionIds: number[];

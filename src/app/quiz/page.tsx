@@ -6,8 +6,10 @@ import { useRouter } from "next/navigation";
 import { OptionButton } from "@/components/OptionButton";
 import { PageShell } from "@/components/PageShell";
 import { ProgressBar } from "@/components/ProgressBar";
-import { getQuestionsByIds } from "@/lib/questions";
+import { SectionBanner } from "@/components/SectionBanner";
+import { getQuestionsByIds, getSectionLabel } from "@/lib/questions";
 import { loadSession, saveSession } from "@/lib/storage";
+import { getSelectedSectionId } from "@/lib/section-context";
 import type { AnswerKey, QuizSession } from "@/types/quiz";
 
 const LETTERS: AnswerKey[] = ["A", "B", "C", "D"];
@@ -18,7 +20,8 @@ export default function QuizPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const stored = loadSession();
+    const sectionId = getSelectedSectionId();
+    const stored = sectionId ? loadSession(sectionId) : null;
     if (!stored || stored.phase !== "in_progress") {
       router.replace("/");
       return;
@@ -29,7 +32,7 @@ export default function QuizPage() {
 
   const questions = useMemo(() => {
     if (!session) return [];
-    return getQuestionsByIds(session.questionIds);
+    return getQuestionsByIds(session.sectionId, session.questionIds);
   }, [session]);
 
   const currentIndex = session?.currentIndex ?? 0;
@@ -85,6 +88,7 @@ export default function QuizPage() {
 
   return (
     <PageShell bottomPad="quiz" className="py-4 sm:py-6">
+      <SectionBanner label={getSectionLabel(session.sectionId)} />
       <div className="mb-4 flex items-center justify-between gap-2 text-sm">
         <Link
           href="/"
